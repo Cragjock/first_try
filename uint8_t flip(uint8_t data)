@@ -1,0 +1,23 @@
+uint8_t flip(uint8_t data)
+{
+    char flip = data;  //   0b01100110; // starting data in
+    char mirror=   0b00000000;          // flipped-rotated data
+    char mask =    0b00000001;
+
+    mirror = ((mirror<<1) + (flip & mask));
+    flip = flip >> 1;
+    mirror = ((mirror<<1) + (flip & mask));
+    flip = flip >> 1;
+    mirror = ((mirror<<1) + (flip & mask));
+    flip = flip >> 1;
+    mirror = ((mirror<<1) + (flip & mask));
+    flip = flip >> 1;
+    mirror = ((mirror<<1) + (flip & mask));;
+    flip = flip >> 1;
+    mirror = ((mirror<<1) + (flip & mask));
+    flip = flip >> 1;
+    mirror = ((mirror<<1) + (flip & mask));
+    flip = flip >> 1;
+    mirror = ((mirror<<1) + (flip & mask));
+    return mirror;
+}
