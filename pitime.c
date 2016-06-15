@@ -1,8 +1,12 @@
+
+
 #include "pitime.h"
 static void error(char*);
 static int open_socket(char* host, char* port);
 static int open_socket2(char* host, char* port);
 static int say(int socket, char* s);
+
+
 
 void error(char* msg)
  {
@@ -64,11 +68,14 @@ void error(char* msg)
 
 char* pitime()
 {
-    printf("from pitime!\n");
+    printf("from pitime_1!\n");
 
     int d_sock;
     //d_sock = open_socket("time-a.timefreq.bldrdoc.gov", "13");
-    d_sock = open_socket("time-b.timefreq.bldrdoc.gov", "13");
+    //d_sock = open_socket("time-b.timefreq.bldrdoc.gov", "13");
+    //d_sock = open_socket("time-a.nist.gov", "13");
+    //d_sock = open_socket("time-b.nist.gov", "13");
+    d_sock = open_socket("time-c.nist.gov", "13");
 
     char buf[255];
 
@@ -77,7 +84,8 @@ char* pitime()
 
     say(d_sock, "Host: ntp2.usno.navy.mil\r\n\r\n");
 
-    char rec[256];
+    //char rec[256];  //char* rec = should have (char*)malloc(256*sizeof(char))
+    char* rec = (char*)malloc(256*sizeof(char));
     int bytesRcvd = recv(d_sock, rec, 255, 0);
     //printf("\n=====BYTES is %i \n", bytesRcvd);
     while (bytesRcvd)
@@ -93,7 +101,55 @@ char* pitime()
         //printf("\n=====BYTES is %i \n", bytesRcvd);
    }
     close(d_sock);
-
-
     return rec;
+}
+
+int buf_pitime(char* myrec)
+{
+    printf("from buf pitime!\n");
+
+    int d_sock;
+    //d_sock = open_socket("time-a.timefreq.bldrdoc.gov", "13");
+    //d_sock = open_socket("time-b.timefreq.bldrdoc.gov", "13");
+    //d_sock = open_socket("time-a.nist.gov", "13");
+    //d_sock = open_socket("time-b.nist.gov", "13");
+    d_sock = open_socket("time-c.nist.gov", "13");
+
+    char buf[255];
+
+    //printf(buf);
+    //say(d_sock, buf);
+
+    say(d_sock, "Host: ntp2.usno.navy.mil\r\n\r\n");
+
+    char rec[256];
+
+    int bytesRcvd = recv(d_sock, myrec, 255, 0);
+    //printf("\n=====BYTES is %i \n", bytesRcvd);
+    while (bytesRcvd)
+    {
+        if (bytesRcvd == -1)
+            error("Can't read from server");
+        //printf("\n=====REC[] = 0 is next \n");
+        rec[bytesRcvd] = '\0';
+        printf("%s", myrec);
+        //printf("\n=====RECIEVING next is %i \n", bytesRcvd);
+        bytesRcvd = recv(d_sock, myrec, 255, 0);
+        //bytesRcvd = recv(d_sock, rec, 255, MSG_DONTWAIT);
+        //printf("\n=====BYTES is %i \n", bytesRcvd);
+   }
+    close(d_sock);
+    int sizeit = sizeof(myrec);
+    return sizeit;
+}
+
+
+
+int no_net_pitime(char* myrec)
+{
+    printf("from  no net pitime!\n");
+    char tdata[] = "57551 16-06-12 03:58:16 50 0 0 245.3 UTC(NIST) *";
+    strcpy(myrec,tdata);
+
+    return 51;
 }

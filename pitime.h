@@ -10,10 +10,7 @@
 #include <unistd.h>
 
 
-//static void error(char*);
-//static int open_socket(char* host, char* port);
-//static int open_socket2(char* host, char* port);
-//static int say(int socket, char* s);
 
 char* pitime();
-char* alt_pitime(); 
+int buf_pitime(char* myrec);
+int no_net_pitime(char* myrec);
