@@ -126,6 +126,15 @@ int main(int argc, char* argv[])
 
 /// LCD stuff and test stuff
 
+        //lcd_home();
+        cout<<endl;
+        if(testlook.EL > 0)
+            //lcd_write("Look angles:visible\n");
+            cout<<"Look angles:visible"<<endl;
+        else
+            //lcd_write("Look angles:below  \n");
+            cout<<"Look angles:below"<<endl;
+
 		sprintf(smallbuf, "AZ:%6.2f EL:%6.2f", Deg(testlook.AZ), Deg(testlook.EL));
         cout<<smallbuf<<endl;
         dc = strlen(smallbuf);
@@ -139,18 +148,17 @@ int main(int argc, char* argv[])
         sprintf(buf, "Location %s", PLACENTIA.obsname);
         sprintf(buf1, "LT:%6.2f LG:%6.2f", Deg(PLACENTIA.lat), Deg(PLACENTIA.lon));
         strcat(buf,buf1);
-        sprintf(buf1, "Range: %6.2f", SB.range);
+        sprintf(buf1, "Range: %6.2f", testlook.RG);
         strcat(buf,buf1);
 
 
         dc = strlen(buf);
-        cout<<buf<<" length is "<<dc<<endl;
-        //cout<<lcd_data[0]<<endl;
-
+        //cout<<buf<<" length is "<<dc<<endl;
 
         sprintf(buf, "LT:%6.2f LG:%6.2f", Deg(PLACENTIA.lat), Deg(PLACENTIA.lon));
-        cout<<buf<<endl;
-        sprintf(buf, "Range: %f", SB.range);
+        //cout<<buf<<endl;
+        sprintf(buf, "Range: %6.2f", testlook.RG);
+        //sprintf(buf, "Range: %f", SB.range);
         cout<<buf<<endl;
 
         memset(row1, ' ', row_length);
@@ -169,46 +177,61 @@ int main(int argc, char* argv[])
         strcpy(ddram_data,row1);        /// strcpy v strcat need this to set ddram_data ????
 
         //sprintf(row3, "Incl: %6.2f        ", Eset.dIncl);
-        sprintf(row_3, "Incl: %6.2f ", Eset.dIncl);
+        sprintf(row_3, "Incl: %6.2f", Eset.dIncl);
         dc = strlen(row_3);
         memcpy(row3, row_3, dc-1);
         strcat(ddram_data,row3);
         //cout<<buf<<endl;
 
+
+        double lcd_period = period_from_MM(Eset.dMM);
+        //cout<<"===period for LCD= "<<lcd_period<<endl;
+
         //sprintf(row2, "MM: %6.2f          ",Eset.dMM);
-        sprintf(row_2, "MM: %6.2f ",Eset.dMM);
+        sprintf(row_2, "MM: %6.2f",Eset.dMM);
         dc = strlen(row_2);
         memcpy(row2, row_2, dc-1);
         strcat(ddram_data,row2);
         //cout<<buf<<endl;
 
-        sprintf(row_4, "MA:%6.2f", Eset.dMA);
+        sprintf(row_4, "Period:%6.2f", lcd_period);
         dc = strlen(row_4);
-        memcpy(row4, row_4, dc-1);
+        memcpy(row4, row_4, dc);
         strcat(ddram_data,row4);
 
+        //sprintf(row_4, "MA:%6.2f", Eset.dMA);
+        //dc = strlen(row_4);
+        //memcpy(row4, row_4, dc-1);
+        //strcat(ddram_data,row4);
+
         //cout<<"ddram_data "<<ddram_data<<endl;
-        cout<<"row 1: "<<row1<<endl;
-        cout<<"size row 1: "<<strlen(row1)<<endl;
-        cout<<"row 2: "<<row2<<endl;
-        cout<<"size row 2: "<<strlen(row2)<<endl;
-        cout<<"row 3: "<<row3<<endl;
-        cout<<"size row 3: "<<strlen(row3)<<endl;
-        cout<<"row 4: "<<row4<<endl;
-        cout<<"size row 4: "<<strlen(row4)<<endl;
+        //cout<<"row 1: "<<row1<<endl;
+        //cout<<"size row 1: "<<strlen(row1)<<endl;
+        //cout<<"row 2: "<<row2<<endl;
+        //cout<<"size row 2: "<<strlen(row2)<<endl;
+        //cout<<"row 3: "<<row3<<endl;
+        //cout<<"size row 3: "<<strlen(row3)<<endl;
+        //cout<<"row 4: "<<row4<<endl;
+        //cout<<"size row 4: "<<strlen(row4)<<endl;
+        cout<<row1<<endl;
+        cout<<row2<<endl;
+        cout<<row3<<endl;
+        cout<<row4<<endl;
 
 
-        //lcd_clear();
-        //lcd_write(ddram_data);
-        //lcd_clear();
-        //lcd_write(row1);
-        //lcd_set_cursor_address(0x40);
-        //lcd_write(row2);
-        //lcd_set_cursor_address(0x14);
-        //lcd_write(row3);
-        //lcd_set_cursor_address(0x54);
-        //lcd_write(row4);
-        //lcd_write(buf2);
+        #ifdef __linux__
+        lcd_clear();
+        lcd_write(ddram_data);
+        lcd_clear();
+        lcd_write(row1);
+        lcd_set_cursor_address(0x40);
+        lcd_write(row2);
+        lcd_set_cursor_address(0x14);
+        lcd_write(row3);
+        lcd_set_cursor_address(0x54);
+        lcd_write(row4);
+        lcd_write(buf2);
+        #endif // __linux__
          /**
             ====================
             Look angles:visible
@@ -222,23 +245,31 @@ int main(int argc, char* argv[])
 
             ====================
             Tracking:ISS (ZARYA)
-            Incl:12345
-            MM: 123456
-            MA: 123456
+            Incl:52.36
+            MM: 123456 MA: 123456
+            Period: 92.36 min
 
         **/
+/// LCD stuff and test stuff done
 
 		goal = wait + clock();
 		while( goal > clock() );
-
 	}
 
-	while(!(_kbhit()));
+	#ifdef __linux__
+    	while(1);
+    #elif _WIN32
+        while(!(_kbhit()));
+    #else
+    #endif
+
+	//while(!(_kbhit()));
 
 	free(row_1);
 	free(row_2);
 	free(row_3);
 	free(row_4);
+	free(ddram_data);
 
 	return 0;
 }
