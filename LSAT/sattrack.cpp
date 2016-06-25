@@ -134,6 +134,7 @@ int main(int argc, char* argv[])
 
 /// LCD setup and stuff
 
+        cout<<endl;
         lcd_home();
         if(testlook.EL > 0)
             lcd_write("Look angles:visible\n");
@@ -159,12 +160,11 @@ int main(int argc, char* argv[])
         //lcd_write(buf);
 
         dc = strlen(buf);
-        cout<<buf<<" length is "<<dc<<endl;
-
+        //cout<<buf<<" length is "<<dc<<endl;
 
         sprintf(buf, "LT:%6.2f LG:%6.2f", Deg(PLACENTIA.lat), Deg(PLACENTIA.lon));
         cout<<buf<<endl;
-        sprintf(buf, "Range: %f", SB.range);
+        sprintf(buf, "Range: %6.2f", SB.range);
         cout<<buf<<endl;
 
         memset(row1, ' ', row_length);
@@ -189,6 +189,11 @@ int main(int argc, char* argv[])
         strcat(ddram_data,row3);
         //strcpy(row3,buf);
         //cout<<buf<<endl;
+
+        double lcd_period = period_from_MM(Eset.dMM);
+        //cout<<"===period for LCD= "<<lcd_period<<endl;
+
+
         //sprintf(row_2, "MM: %6.2f          ",Eset.dMM);
         sprintf(row_2, "MM: %6.2f",Eset.dMM);
         dc = strlen(row_2);
@@ -196,21 +201,33 @@ int main(int argc, char* argv[])
         strcat(ddram_data,row2);
         //strcpy(row2,buf);
         //cout<<buf<<endl;
-        sprintf(row_4, "MA:%6.2f", Eset.dMA);
+
+        sprintf(row_4, "Period:%6.2f", lcd_period);
         dc = strlen(row_4);
-        memcpy(row4, row_4, dc-1);
+        memcpy(row4, row_4, dc);
         strcat(ddram_data,row4);
 
-        cout<<"ddram_data "<<ddram_data<<endl;
-        cout<<"row 1: "<<row1<<endl;
-        cout<<"size row 1: "<<strlen(row1)<<endl;
-        cout<<"row 2: "<<row2<<endl;
-        cout<<"size row 2: "<<strlen(row2)<<endl;
-        cout<<"row 3: "<<row3<<endl;
-        cout<<"size row 3: "<<strlen(row3)<<endl;
-        cout<<"row 4: "<<row4<<endl;
-        cout<<"size row 4: "<<strlen(row4)<<endl;
+        //sprintf(row_4, "MA:%6.2f", Eset.dMA);
+        //dc = strlen(row_4);
+        //memcpy(row4, row_4, dc-1);
+        //strcat(ddram_data,row4);
 
+        //cout<<"ddram_data "<<ddram_data<<endl;
+        //cout<<"row 1: "<<row1<<endl;
+        //cout<<"size row 1: "<<strlen(row1)<<endl;
+        //cout<<"row 2: "<<row2<<endl;
+        //cout<<"size row 2: "<<strlen(row2)<<endl;
+        //cout<<"row 3: "<<row3<<endl;
+        //cout<<"size row 3: "<<strlen(row3)<<endl;
+        //cout<<"row 4: "<<row4<<endl;
+        //cout<<"size row 4: "<<strlen(row4)<<endl;
+        cout<<row1<<endl;
+        cout<<row2<<endl;
+        cout<<row3<<endl;
+        cout<<row4<<endl;
+
+
+        #ifdef __linux__
         lcd_clear();
         lcd_write(ddram_data);
 
@@ -223,6 +240,7 @@ int main(int argc, char* argv[])
         lcd_set_cursor_address(0x54);
         lcd_write(row_4);
         //lcd_write(buf2);
+        #endif // __linux__
 
         /**
             ====================
@@ -249,10 +267,6 @@ int main(int argc, char* argv[])
 
 	}
 
-
-
-
-
 	#ifdef __linux__
     	while(1);
     #elif _WIN32
@@ -264,6 +278,7 @@ int main(int argc, char* argv[])
 	free(row_2);
 	free(row_3);
 	free(row_4);
+	free(ddram_data);
 
 
 	//while(1);
