@@ -161,6 +161,7 @@ int main(int argc, char* argv[])
         //sprintf(buf, "Range: %f", SB.range);
         cout<<buf<<endl;
 
+
         memset(row1, ' ', row_length);
         memset(row2, ' ', row_length);
         memset(row3, ' ', row_length);
