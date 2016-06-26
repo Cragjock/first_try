@@ -73,7 +73,7 @@ int display_control(int item_to_do,
             dc = strlen(row_3);
             memcpy(row3, row_3, dc);
             strcat(ddram_data1,row3);
-            sprintf(row_2, "Range: %6.2f", testlook.RG);
+            sprintf(row_2, "Sat Range: %6.2f", testlook.RG);
             //sprintf(row_2, "Range: %6.2f", SB.range);
             dc = strlen(row_2);
             memcpy(row2, row_2, dc);

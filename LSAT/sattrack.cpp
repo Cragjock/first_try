@@ -25,6 +25,8 @@ int (*device_open)(void);
 //char* (*alt_pitime)();
 int (*alt_pitime)(char*);
 
+static int display_count;
+
 
 
 int main(int argc, char* argv[])
@@ -102,11 +104,29 @@ int main(int argc, char* argv[])
 		cout<<"=====Sat Sub Point===================\n"<<SB;
 
 /// LCD setup and stuff
-    display_control(TRACK,
-                    PLACENTIA,
-                    SB,
-                    Eset,
-                    testlook);
+
+//#define TRACK 0
+//#define LOCATION 1
+//#define SATDATA 2
+
+
+    if(display_count < 10)
+    {
+        display_control(TRACK, PLACENTIA, SB, Eset, testlook);
+        display_count++;
+
+    }
+
+    else
+    {
+        display_control(LOCATION, PLACENTIA, SB, Eset, testlook);
+        display_count++;
+
+    }
+
+
+    if(display_count > 25)
+        display_count = 0;
 
         /**
             ====================
