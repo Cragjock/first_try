@@ -5,13 +5,13 @@
 #include <unistd.h>
 #include "lcd.h"
 #include "pitime.h"
+#include "display.h"
 
 //=============================================================
 //		MAIN
 //=============================================================
 
 
-// setup for threading access
 VectLook AntTracker;
 VectLook testlook;
 void get_NIST();
@@ -25,32 +25,6 @@ int (*device_open)(void);
 //char* (*alt_pitime)();
 int (*alt_pitime)(char*);
 
-char smallbuf[20];
-char buf[80];
-char buf1[80];
-char buf2[80];
-char buf_temp[80]; // used to copy to as interim
-static int dc; // draw counter to determine when to swap lcd write buffers
-
-#define rowlength 23
-#define row_length 20
-#define LCD_row_length 20
-
-char row1[rowlength];  /// was 25, 22 is no good, 23 is ok
-char row2[rowlength];
-char row3[rowlength];
-char row4[rowlength];
-
-char* row_1=new char[row_length];       // 22
-char* row_2=new char[row_length];
-char* row_3=new char[row_length];
-char* row_4=new char[row_length];
-char* ddram_data=new char[81]();    ///the () inits to all zero
-
-
-
-char upper[16] = {"Az: "};
-char lower[16] = {"El: "};
 
 
 int main(int argc, char* argv[])
@@ -60,8 +34,6 @@ int main(int argc, char* argv[])
 	lcd_write("Hello from Steve's\nLCD stuff");
 	lcd_clear();
 	get_NIST();
-
-
 
 	cout.setf(ios::fixed);
 	//=== SET CURRENT TIME ==========================
@@ -102,9 +74,6 @@ int main(int argc, char* argv[])
         test_time*=1440.0;
         //cout<<"test_time delta minutes "<<test_time<<endl;
 
-
-
-
 /**************************************
  local_time minus Eset.dEpochDay matches JDN-E2JD.
  And is easier to check and calculate and no need for
@@ -133,114 +102,11 @@ int main(int argc, char* argv[])
 		cout<<"=====Sat Sub Point===================\n"<<SB;
 
 /// LCD setup and stuff
-
-        cout<<endl;
-        lcd_home();
-        if(testlook.EL > 0)
-            lcd_write("Look angles:visible\n");
-        else
-            lcd_write("Look angles:below  \n");
-
-		sprintf(buf, "AZ:%6.2f EL:%6.2f", Deg(testlook.AZ), Deg(testlook.EL));
-        lcd_write(buf);
-
-        lcd_set_cursor_address(0x14);
-        lcd_write("Sat Lat/long\n");
-
-        sprintf(buf, "LT:%6.2f LG:%6.2f", Deg(SB.lat), Deg(SB.lon));
-        lcd_write(buf);
-
-
-        sprintf(buf, "Location %s", PLACENTIA.obsname);
-        sprintf(buf1, "LT:%6.2f LG:%6.2f", Deg(PLACENTIA.lat), Deg(PLACENTIA.lon));
-        strcat(buf,buf1);
-        sprintf(buf1, "Range: %6.2f", SB.range);
-        strcat(buf,buf1);
-
-        //lcd_write(buf);
-
-        dc = strlen(buf);
-        //cout<<buf<<" length is "<<dc<<endl;
-
-        sprintf(buf, "LT:%6.2f LG:%6.2f", Deg(PLACENTIA.lat), Deg(PLACENTIA.lon));
-        cout<<buf<<endl;
-        sprintf(buf, "Range: %6.2f", SB.range);
-        cout<<buf<<endl;
-
-        memset(row1, ' ', row_length);
-        memset(row2, ' ', row_length);
-        memset(row3, ' ', row_length);
-        memset(row4, ' ', row_length);
-        memset(row_1, ' ', row_length);
-        memset(row_2, ' ', row_length);
-        memset(row_3, ' ', row_length);
-        memset(row_4, ' ', row_length);
-
-        sprintf(row_1, "Tracking:%s ", "ISS (Zarya)");
-        dc = strlen(row_1);
-        memcpy(row1, row_1, dc-1);
-        strcpy(ddram_data,row1);        /// need this to set ddram_data ????
-
-        //cout<<buf<<endl;
-        //sprintf(row_3, "Incl: %6.2f        ", Eset.dIncl);
-        sprintf(row_3, "Incl: %6.2f", Eset.dIncl);
-        dc = strlen(row_3);
-        memcpy(row3, row_3, dc-1);
-        strcat(ddram_data,row3);
-        //strcpy(row3,buf);
-        //cout<<buf<<endl;
-
-        double lcd_period = period_from_MM(Eset.dMM);
-        //cout<<"===period for LCD= "<<lcd_period<<endl;
-
-
-        //sprintf(row_2, "MM: %6.2f          ",Eset.dMM);
-        sprintf(row_2, "MM: %6.2f",Eset.dMM);
-        dc = strlen(row_2);
-        memcpy(row2, row_2, dc-1);
-        strcat(ddram_data,row2);
-        //strcpy(row2,buf);
-        //cout<<buf<<endl;
-
-        sprintf(row_4, "Period:%6.2f", lcd_period);
-        dc = strlen(row_4);
-        memcpy(row4, row_4, dc);
-        strcat(ddram_data,row4);
-
-        //sprintf(row_4, "MA:%6.2f", Eset.dMA);
-        //dc = strlen(row_4);
-        //memcpy(row4, row_4, dc-1);
-        //strcat(ddram_data,row4);
-
-        //cout<<"ddram_data "<<ddram_data<<endl;
-        //cout<<"row 1: "<<row1<<endl;
-        //cout<<"size row 1: "<<strlen(row1)<<endl;
-        //cout<<"row 2: "<<row2<<endl;
-        //cout<<"size row 2: "<<strlen(row2)<<endl;
-        //cout<<"row 3: "<<row3<<endl;
-        //cout<<"size row 3: "<<strlen(row3)<<endl;
-        //cout<<"row 4: "<<row4<<endl;
-        //cout<<"size row 4: "<<strlen(row4)<<endl;
-        cout<<row1<<endl;
-        cout<<row2<<endl;
-        cout<<row3<<endl;
-        cout<<row4<<endl;
-
-
-        #ifdef __linux__
-        lcd_clear();
-        lcd_write(ddram_data);
-
-        lcd_clear();
-        lcd_write(row_1);
-        lcd_set_cursor_address(0x40);
-        lcd_write(row_2);
-        lcd_set_cursor_address(0x14);
-        lcd_write(row_3);
-        lcd_set_cursor_address(0x54);
-        lcd_write(row_4);
-        //lcd_write(buf2);
-        #endif // __linux__
+    display_control(TRACK,
+                    PLACENTIA,
+                    SB,
+                    Eset,
+                    testlook);
 
         /**
             ====================
@@ -273,13 +139,6 @@ int main(int argc, char* argv[])
         while(!(_kbhit()));
     #else
     #endif
-
-    free(row_1);
-	free(row_2);
-	free(row_3);
-	free(row_4);
-	free(ddram_data);
-
 
 	//while(1);
     //while(!(_kbhit()));
