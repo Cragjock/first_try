@@ -6,7 +6,7 @@
 
 
 
-/// THIS IS CURRENT VERSION 06-22
+/// THIS IS CURRENT VERSION 06-26
 /// d code sattrack
 
 //=============================================================
@@ -18,7 +18,7 @@ VectLook AntTracker;
 VectLook testlook;
 char NL = '\n';
 char EL = '\0';
-
+static int display_count;
 
 
 int main(int argc, char* argv[])
@@ -91,13 +91,26 @@ int main(int argc, char* argv[])
 
 
 /// LCD stuff and test stuff
+//#define TRACK 0
+//#define LOCATION 1
+//#define SATDATA 2
+if(display_count < 10)
+    {
+        display_control(TRACK, PLACENTIA, SB, Eset, testlook);
+        display_count++;
+
+    }
+
+    else
+    {
+        display_control(LOCATION, PLACENTIA, SB, Eset, testlook);
+        display_count++;
+
+    }
 
 
-        display_control(TRACK,
-                    PLACENTIA,
-                    SB,
-                    Eset,
-                    testlook);
+    if(display_count > 25)
+        display_count = 0;
 
 
          /**
