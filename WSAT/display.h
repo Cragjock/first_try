@@ -31,4 +31,5 @@ int display_control(int item_to_do, Observer Obs,
             MA: 123456
 
         **/
+int winNIST();
 #endif

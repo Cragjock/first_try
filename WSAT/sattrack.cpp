@@ -23,6 +23,9 @@ static int display_count;
 
 int main(int argc, char* argv[])
 {
+
+	winNIST();
+
 	cout.setf(ios::fixed);
 	//=== SET CURRENT TIME ==========================
 	struct tm *newtime;								//--- for time now
@@ -94,7 +97,8 @@ int main(int argc, char* argv[])
 //#define TRACK 0
 //#define LOCATION 1
 //#define SATDATA 2
-if(display_count < 10)
+    winNIST();
+    if(display_count < 5)
     {
         display_control(TRACK, PLACENTIA, SB, Eset, testlook);
         display_count++;
@@ -109,7 +113,7 @@ if(display_count < 10)
     }
 
 
-    if(display_count > 25)
+    if(display_count > 10)
         display_count = 0;
 
 
